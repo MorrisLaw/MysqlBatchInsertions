@@ -67,7 +67,7 @@ public class DbInsertion {
         String reviewer = null;
         try {
             // Read in the file from local disk.
-            FileInputStream inputStream = new FileInputStream("/Users/jermorri/Documents/TimRichAmazonData/aggressive_dedup.json");
+            FileInputStream inputStream = new FileInputStream("/Users/jeremy/Documents/AmazonData/huge_file.json");
             // Scan each line of the json file and pass into gsonParser.
             Scanner sc = new Scanner(inputStream, "UTF-8");
             while(sc.hasNextLine()) {
