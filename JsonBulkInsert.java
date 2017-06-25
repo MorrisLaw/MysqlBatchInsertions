@@ -16,7 +16,7 @@ import java.util.Scanner;
  */
 public class DbInsertion {
     /**
-     * This class inserts data into a mysql database with the use of prepared statements and 100,000 row batches.
+     * This class inserts data into a mysql database with the use of prepared statements and 10,000 row batches.
      */
 
     // JDBC driver name and database URL local disk database.
