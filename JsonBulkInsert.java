@@ -22,8 +22,6 @@ public class DbInsertion {
     // JDBC driver name and database URL local disk database.
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/amazon_dump";
-
-    // Database credentials.
     static final String USER = "root";
     static final String PASSWORD = "root";
 
@@ -32,31 +30,18 @@ public class DbInsertion {
         Connection mysqlConnection = null;
         PreparedStatement preparedStatement = null;
         try {
-            // Register the JDBC driver.
             Class.forName(JDBC_DRIVER);
 
-            // Open a connection.
             System.out.println("Connection to database...");
             mysqlConnection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
-
-            // Create SQL query statement.
             String query = " insert into reviewer (reviewerID, asin, reviewerName, helpful, reviewText, overall, summary, "
                     + "unixReviewTime, reviewTime) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            // Create prepared statement.
             System.out.println("Creating sql statement...");
             preparedStatement = mysqlConnection.prepareStatement(query);
-
-            // Set auto-commit to false.
             mysqlConnection.setAutoCommit(false);
-
-            // Execute the prepared statement in batches. Then insert, a batch at a time, into the database.
             getJsonStrings(mysqlConnection, preparedStatement);
-
-            // Close up resources.
             preparedStatement.close();
             mysqlConnection.close();
-
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -66,13 +51,10 @@ public class DbInsertion {
         LinkedHashSet<String> jsonLineSet = new LinkedHashSet<>();
         String reviewer = null;
         try {
-            // Read in the file from local disk.
             FileInputStream inputStream = new FileInputStream("/Users/jeremy/Documents/AmazonData/huge_file.json");
-            // Scan each line of the json file and pass into gsonParser.
             Scanner sc = new Scanner(inputStream, "UTF-8");
             while(sc.hasNextLine()) {
                 for (int i = 0; i < 10000; i++) {
-                    // Next line in scanned json file.
                     if (sc.hasNextLine()) {
                         reviewer = sc.nextLine();
                         jsonLineSet.add(reviewer);
@@ -84,6 +66,7 @@ public class DbInsertion {
                 }
                 insertData(mySqlConnection, preparedStatement, jsonLineSet);
             }
+            sc.close();
         }catch(IOException ie) {
             ie.printStackTrace();
         }
@@ -94,11 +77,8 @@ public class DbInsertion {
         for(String jsonLine : jsonLineSet) {
             try {
                 System.out.println("Executing query...");
-                // Parse line from json file.
                 JsonElement jsonElement = new JsonParser().parse(jsonLine);
-                // Retrieve as a json object.
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-                // Get json object fields as string.
                 String id = jsonObject.get("reviewerID").getAsString();
                 String asin = jsonObject.get("asin").getAsString();
                 String name = "";
@@ -134,18 +114,14 @@ public class DbInsertion {
                 preparedStatement.setString(7, summary);
                 preparedStatement.setString(8, unixReviewTime);
                 preparedStatement.setString(9, reviewTime);
-                // Add insert query to batch.
                 preparedStatement.addBatch();
             }catch(SQLException se) {
                 se.printStackTrace();
             }
         }
         try {
-            // Execute queries within the batch.
             preparedStatement.executeBatch();
-            // Commit the execution of queries.
             mySqlConnection.commit();
-            // Clear and prepare batch for next round query pooling.
             preparedStatement.clearBatch();
         }catch(SQLException se) {
             se.printStackTrace();
