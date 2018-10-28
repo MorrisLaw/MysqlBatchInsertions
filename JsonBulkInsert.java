@@ -56,11 +56,10 @@ public class DbInsertion {
             while(sc.hasNextLine()) {
                 for (int i = 0; i < 10000; i++) {
                     if (sc.hasNextLine()) {
-                        reviewer = sc.nextLine();
-                        jsonLineSet.add(reviewer);
+                        jsonLineSet.add(sc.nextLine());
                     } else {
-                        System.out.println("Done!");
                         insertData(mySqlConnection, preparedStatement, jsonLineSet);
+                        System.out.println("Done!");
                         break;
                     }
                 }
